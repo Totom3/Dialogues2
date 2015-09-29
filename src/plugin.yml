@@ -1,0 +1,11 @@
+name: Dialogues2
+author: Totom3
+version: 1.0
+description: A plugin that allows users to create rich and complex dialogues.
+main: io.github.totom3.dialogues.Main
+
+commands:
+    dialogues:
+        description: Compiles, (un)loads and starts dialogues!
+        usage: /dialogues help
+        aliases: [dlgs]
