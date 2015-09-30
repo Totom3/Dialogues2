@@ -81,12 +81,18 @@ public class DialogueSession implements Runnable {
 	}
     }
 
+    // TODO: remove method
+    private void jumpToPrompt(DialoguePrompt prompt) {
+	currentPrompt = prompt;
+	System.out.println("Jumped to prompt " + ((prompt == null) ? "null" : prompt.promptID()));
+    }
+
     public void start() {
 	if (started) {
 	    throw new IllegalStateException("Session is already started");
 	}
 
-	currentPrompt = dialogue.firstPrompt();
+	jumpToPrompt(dialogue.firstPrompt());
 	if (currentPrompt == null) {
 	    throw new IllegalStateException("Dialogue doesn't have a first prompt.");
 	}
@@ -171,6 +177,7 @@ public class DialogueSession implements Runnable {
 
 	acceptsInput = false;
 	if (timeoutScheduled) {
+	    timeoutScheduled = false;
 	    cancelTask();
 	}
 
@@ -179,7 +186,7 @@ public class DialogueSession implements Runnable {
 	    broadcastMessage(msg);
 	}
 
-	currentPrompt = dialogue.getPrompt(inputChoice.nextPromptID());
+	jumpToPrompt(dialogue.getPrompt(inputChoice.nextPromptID()));
 	action = ACCEPT_PROMPT;
 	run();
     }
@@ -213,7 +220,7 @@ public class DialogueSession implements Runnable {
 
     private void handlePostMessage() {
 	if (!currentPrompt.requiresChoices()) {
-	    currentPrompt = currentPrompt.nextPrompt();
+	    jumpToPrompt(currentPrompt.nextPrompt());
 	    action = ACCEPT_PROMPT;
 	    run();
 	    return;
@@ -239,7 +246,7 @@ public class DialogueSession implements Runnable {
 	cancelTask();
 	acceptsInput = false;
 
-	currentPrompt = currentPrompt.nextPrompt();
+	jumpToPrompt(currentPrompt.nextPrompt());
 	action = ACCEPT_PROMPT;
 	run();
     }
@@ -275,15 +282,18 @@ public class DialogueSession implements Runnable {
     }
 
     void terminate(boolean notifyManager) {
+	if (notifyManager) {
+	    DialogueSessionsManager.get().onStop(this);
+	}
+	
 	cancelTask();
 	acceptsInput = false;
 	timeoutScheduled = false;
 	currentPrompt = null;
 	started = false;
 	participants.clear();
-	if (notifyManager) {
-	    DialogueSessionsManager.get().onStop(this);
-	}
+	System.out.println("Session terminated!");
+	
     }
 
     /**

@@ -43,7 +43,7 @@ public class DefaultMessageFormatter implements MessageFormatter {
 	}
 
 	StringBuilder builder = new StringBuilder();
-	builder.append("  ").append(ChatColor.GOLD).append(choice.choiceID()).append(". ").append(ChatColor.YELLOW);
+	builder.append(ChatColor.GOLD).append(" ").append(choice.choiceID()).append(". ").append(ChatColor.YELLOW);
 
 	StringBuffer messageBuffer = applyVariablesAndColors(session, message);
 	builder.append(messageBuffer);
